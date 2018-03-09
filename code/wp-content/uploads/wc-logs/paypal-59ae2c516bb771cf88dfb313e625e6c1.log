@@ -1,0 +1,120 @@
+12-05-2016 @ 04:33:38 - Subscription Request Parameters: Array
+(
+    [method] => POST
+    [uri] => https://api-3t.paypal.com/nvp
+    [user-agent] => WooCommerce-Subscriptions-PayPal/2.0.19 (WooCommerce/2.6.8; WordPress/4.6.1)
+    [headers] => Array
+        (
+        )
+
+    [body] => Array
+(
+    [USER] => *************************
+    [PWD] => ****************
+    [SIGNATURE] => ********************************************************
+    [VERSION] => 124
+    [METHOD] => SetExpressCheckout
+    [L_BILLINGTYPE0] => MerchantInitiatedBillingSingleAgreement
+    [L_BILLINGAGREEMENTDESCRIPTION0] => Orders with CSArt Maine
+    [RETURNURL] => http://csartmaine.dev:8888/wc-api/wcs_paypal/?action=reference_transaction_account_check
+    [CANCELURL] => http://csartmaine.dev:8888/wc-api/wcs_paypal/?action=reference_transaction_account_check
+    [BRANDNAME] => CSArt Maine
+    [LANDINGPAGE] => Login
+    [NOSHIPPING] => 1
+    [MAXAMT] => 0.00
+)
+
+    [duration] => 0.79433s
+)
+
+12-05-2016 @ 04:33:38 - Subscription Request Response: Array
+(
+    [code] => 200
+    [message] => OK
+    [headers] => Requests_Utility_CaseInsensitiveDictionary Object
+        (
+            [data:protected] => Array
+                (
+                    [date] => Mon, 05 Dec 2016 04:33:38 GMT
+                    [server] => Apache
+                    [x-slr-retry-api] => SetExpressCheckout
+                    [x-paypal-operation-name] => SetExpressCheckout
+                    [x-paypal-api-rc] => 11452
+                    [cache-control] => Array
+                        (
+                            [0] => max-age=0, no-cache, no-store, must-revalidate
+                            [1] => max-age=0, no-cache, no-store, must-revalidate
+                        )
+
+                    [pragma] => Array
+                        (
+                            [0] => no-cache
+                            [1] => no-cache
+                        )
+
+                    [http_x_pp_az_locator] => dcg11.slc
+                    [paypal-debug-id] => 424a3aee18c5e
+                    [set-cookie] => Array
+                        (
+                            [0] => X-PP-SILOVER=name%3DLIVE6.APIT.1%26silo_version%3D880%26app%3Dappdispatcher_apit%26TIME%3D586040408%26HTTP_X_PP_AZ_LOCATOR%3Ddcg11.slc; Expires=Mon, 05 Dec 2016 05:03:38 GMT; domain=.paypal.com; path=/; Secure; HttpOnly
+                            [1] => X-PP-SILOVER=; Expires=Thu, 01 Jan 1970 00:00:01 GMT
+                        )
+
+                    [content-length] => 291
+                    [content-type] => text/plain; charset=utf-8
+                )
+
+        )
+
+    [body] => Array
+(
+    [TIMESTAMP] => 2016-12-05T04:33:38Z
+    [CORRELATIONID] => 424a3aee18c5e
+    [ACK] => Failure
+    [VERSION] => 124
+    [BUILD] => 000000
+    [L_ERRORCODE0] => 11452
+    [L_SHORTMESSAGE0] => Merchant not enabled for reference transactions
+    [L_LONGMESSAGE0] => Merchant not enabled for reference transactions
+    [L_SEVERITYCODE0] => Error
+)
+
+)
+
+03-21-2017 @ 23:44:03 - Subscription Request Parameters: Array
+(
+    [method] => POST
+    [uri] => https://api-3t.paypal.com/nvp
+    [user-agent] => WooCommerce-Subscriptions-PayPal/2.0.19 (WooCommerce/2.6.14; WordPress/4.7.3)
+    [headers] => Array
+        (
+        )
+
+    [body] => Array
+(
+    [USER] => *************************
+    [PWD] => ****************
+    [SIGNATURE] => ********************************************************
+    [VERSION] => 124
+    [METHOD] => SetExpressCheckout
+    [L_BILLINGTYPE0] => MerchantInitiatedBillingSingleAgreement
+    [L_BILLINGAGREEMENTDESCRIPTION0] => Orders with CSArt Maine
+    [RETURNURL] => http://csartmaine.dev:8888/wc-api/wcs_paypal/?action=reference_transaction_account_check
+    [CANCELURL] => http://csartmaine.dev:8888/wc-api/wcs_paypal/?action=reference_transaction_account_check
+    [BRANDNAME] => CSArt Maine
+    [LANDINGPAGE] => Login
+    [NOSHIPPING] => 1
+    [MAXAMT] => 0.00
+)
+
+    [duration] => 0.27521s
+)
+
+03-21-2017 @ 23:44:03 - Subscription Request Response: Array
+(
+    [code] => 
+    [message] => 
+    [headers] => 
+    [body] => 
+)
+

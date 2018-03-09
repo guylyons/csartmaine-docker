@@ -1,0 +1,8 @@
+08-25-2017 @ 17:04:01 - v2.1: Deleted cached subscription ranges.
+08-25-2017 @ 17:04:01 - v2.1: Set _schedule_cancelled date to post_modified_gmt column value for 0 subscriptions with wc-pending-cancel status.
+08-25-2017 @ 17:04:01 - v2.1: Set _schedule_cancelled date to post_modified_gmt column value for 3 subscriptions with wc-cancelled status.
+08-25-2017 @ 17:04:01 - Upgrade complete. Scheduling log cleanup for 2017-10-20 17:04:01 GMT/UTC
+09-29-2017 @ 17:57:02 - v2.1: Deleted cached subscription ranges.
+09-29-2017 @ 17:57:02 - v2.1: Set _schedule_cancelled date to post_modified_gmt column value for 0 subscriptions with wc-pending-cancel status.
+09-29-2017 @ 17:57:02 - v2.1: Set _schedule_cancelled date to post_modified_gmt column value for 3 subscriptions with wc-cancelled status.
+09-29-2017 @ 17:57:02 - Upgrade complete. Scheduling log cleanup for 2017-11-24 17:57:02 GMT/UTC

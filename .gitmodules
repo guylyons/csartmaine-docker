@@ -1,0 +1,3 @@
+[submodule "code/wp-content/themes/csartmaine"]
+	path = code/wp-content/themes/csartmaine
+	url = https://github.com/guylyons/csartmaine-wp

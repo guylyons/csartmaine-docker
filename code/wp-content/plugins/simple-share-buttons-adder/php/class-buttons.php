@@ -160,9 +160,9 @@ class Buttons {
 			 ||
 			 ( is_single() && ( 'Y' !== $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_posts'] || ( 'Y' === $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_plus_posts'] ) ) )
 			 ||
-			 ( is_category() && 'Y' === ( 'Y' !== $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_cats_archs'] || ( 'Y' === $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_plus_cats_archs'] ) ) )
+			 ( is_category() && ( 'Y' !== $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_cats_archs'] || ( 'Y' === $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_plus_cats_archs'] ) ) )
 			 ||
-			 ( is_archive() && 'Y' === ( 'Y' !== $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_cats_archs'] || ( 'Y' === $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_plus_cats_archs'] ) ) )
+			 ( is_archive() && ( 'Y' !== $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_cats_archs'] || ( 'Y' === $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_plus_cats_archs'] ) ) )
 			 ||
 			 ( ( is_home() || is_front_page() ) && ( 'Y' !== $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_homepage'] || ( 'Y' === $arr_settings['ssba_new_buttons'] && 'Y' === $arr_settings['ssba_plus_homepage'] ) ) )
 			 ||
@@ -418,10 +418,6 @@ class Buttons {
 	 * @return string
 	 */
 	public function get_share_buttons( $arr_settings, $url_current_page, $str_page_title, $int_post_id ) {
-		// Remove wpautop from formatting the buttons.
-		remove_filter( 'the_content', 'wpautop' );
-		remove_filter( 'the_excerpt', 'wpautop' );
-
 		// Variables.
 		$html_share_buttons = '';
 
@@ -671,9 +667,9 @@ class Buttons {
 		// If sharedcount.com is enabled.
 		if ( ( ( 'Y' === $arr_settings['sharedcount_enabled'] && 'Y' !== $arr_settings['ssba_new_buttons'] )
 		       ||
-		       ( 'Y' === $arr_settings['plus-sharedcount-enabled'] && 'Y' === $arr_settings['ssba_new_buttons'] )
+		       ( 'Y' === $arr_settings['plus_sharedcount_enabled'] && 'Y' === $arr_settings['ssba_new_buttons'] )
 		       ||
-		       ( 'Y' === $arr_settings['bar-sharedcount-enabled'] && isset( $arr_settings['bar_call'] )
+		       ( 'Y' === $arr_settings['bar_sharedcount_enabled'] && isset( $arr_settings['bar_call'] )
 		       )
 		) ) {
 

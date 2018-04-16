@@ -89,5 +89,10 @@ class Xyz_Insert_Html_Widget extends WP_Widget {
  
  
 } // end class Xyz_Insert_Html_Widget
-add_action('widgets_init', create_function('', 'return register_widget("Xyz_Insert_Html_Widget");'));
+
+function xyz_ihs_add_snippet_widget(){
+       register_widget("Xyz_Insert_Html_Widget");
+}
+add_action('widgets_init','xyz_ihs_add_snippet_widget');
+
 ?>

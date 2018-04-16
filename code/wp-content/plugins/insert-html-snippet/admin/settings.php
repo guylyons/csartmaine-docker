@@ -5,12 +5,12 @@ global $wpdb;
 // Load the options
 
 
-if(isset($_GET['ihs_notice'])&& $_GET['ihs_notice'] == 'hide')
+if(!$_POST && isset($_GET['ihs_notice'])&& $_GET['ihs_notice'] == 'hide')
 {
 	if (! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'],'ihs-shw')){
 		wp_nonce_ays( 'ihs-shw');
 		exit;
-	} 
+	}
 	update_option('xyz_ihs_dnt_shw_notice', "hide");
 	?>
 <style type='text/css'>
@@ -42,13 +42,13 @@ Thanks again for using the plugin. We will never show the message again.
 				{
 					update_option('xyz_credit_link',$xyz_ihs_credit);
 				}
-		 	
+
 			$xyz_ihs_sortfield=sanitize_text_field($_POST['xyz_ihs_sort_by_field']);
 			if(($xyz_ihs_sortfield=="title")||($xyz_ihs_sortfield=="id"))
 				{
 					update_option('xyz_ihs_sort_field_name',$xyz_ihs_sortfield);
 				}
-			
+
 			$xyz_ihs_sortorder=sanitize_text_field($_POST['xyz_ihs_sort_by_order']);
 			if(($xyz_ihs_sortorder=="asc")||($xyz_ihs_sortorder=="desc"))
 				{
@@ -57,7 +57,7 @@ Thanks again for using the plugin. We will never show the message again.
 
 
 			update_option('xyz_ihs_limit',$xyz_ihs_limit);
-			
+
 ?>
 <div class="xyz_system_notice_area_style1" id="xyz_system_notice_area">
 	Settings updated successfully. &nbsp;&nbsp;&nbsp;
@@ -120,11 +120,11 @@ Thanks again for using the plugin. We will never show the message again.
 							<label for="xyz_ihs_pre_ads">Premium Version Ads</label>
 						</td>
 						<td>
-							<select name="xyz_ihs_pre_ads" id="xyz_ihs_pre_ads">				
+							<select name="xyz_ihs_pre_ads" id="xyz_ihs_pre_ads">
 								<option value="0">Disable</option>
 								<option value="1" <?php selected(get_option('xyz_ihs_premium_version_ads'),1);?>>Enable</option>
 							</select>
-						</td>				
+						</td>
 					</tr>
 					<tr valign="top">
 						<td scope="row" class=" xyz_ihs_settingInput" id="xyz_ihs_bottomBorderNone">

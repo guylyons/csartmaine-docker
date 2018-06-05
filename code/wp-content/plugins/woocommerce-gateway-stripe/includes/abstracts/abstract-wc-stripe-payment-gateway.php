@@ -165,7 +165,9 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 	}
 
 	/**
-	 * Check if this gateway is enabled
+	 * Check if we need to make gateways available.
+	 *
+	 * @since 4.1.3
 	 */
 	public function is_available() {
 		if ( 'yes' === $this->enabled ) {
@@ -219,15 +221,14 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 	 */
 	public function payment_icons() {
 		return apply_filters( 'wc_stripe_payment_icons', array(
-			'visa'       => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/visa.svg" class="stripe-visa-icon stripe-icon" alt="Visa" />',
-			'amex'       => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/amex.svg" class="stripe-amex-icon stripe-icon" alt="American Express" />',
-			'mastercard' => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/mastercard.svg" class="stripe-mastercard-icon stripe-icon" alt="Mastercard" />',
-			'discover'   => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/discover.svg" class="stripe-discover-icon stripe-icon" alt="Discover" />',
-			'diners'     => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/diners.svg" class="stripe-diners-icon stripe-icon" alt="Diners" />',
-			'jcb'        => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/jcb.svg" class="stripe-jcb-icon stripe-icon" alt="JCB" />',
+			'visa'       => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/visa.svg" class="stripe-visa-icon stripe-icon" alt="Visa" />',
+			'amex'       => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/amex.svg" class="stripe-amex-icon stripe-icon" alt="American Express" />',
+			'mastercard' => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/mastercard.svg" class="stripe-mastercard-icon stripe-icon" alt="Mastercard" />',
+			'discover'   => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/discover.svg" class="stripe-discover-icon stripe-icon" alt="Discover" />',
+			'diners'     => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/diners.svg" class="stripe-diners-icon stripe-icon" alt="Diners" />',
+			'jcb'        => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/jcb.svg" class="stripe-jcb-icon stripe-icon" alt="JCB" />',
 			'alipay'     => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/alipay.svg" class="stripe-alipay-icon stripe-icon" alt="Alipay" />',
 			'wechat'     => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/wechat.svg" class="stripe-wechat-icon stripe-icon" alt="Wechat Pay" />',
-			'bitcoin'    => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/bitcoin.svg" class="stripe-bitcoin-icon stripe-icon" alt="Bitcoin" />',
 			'bancontact' => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/bancontact.svg" class="stripe-bancontact-icon stripe-icon" alt="Bancontact" />',
 			'ideal'      => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/ideal.svg" class="stripe-ideal-icon stripe-icon" alt="iDeal" />',
 			'p24'        => '<img src="' . WC_STRIPE_PLUGIN_URL . '/assets/images/p24.svg" class="stripe-p24-icon stripe-icon" alt="P24" />',
@@ -937,7 +938,7 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 
 			$amount = wc_price( $response->amount / 100 );
 
-			if ( in_array( strtolower( $order->get_currency() ), WC_Stripe_Helper::no_decimal_currencies() ) ) {
+			if ( in_array( strtolower( WC_Stripe_Helper::is_pre_30() ? $order->get_order_currency() : $order->get_currency() ), WC_Stripe_Helper::no_decimal_currencies() ) ) {
 				$amount = wc_price( $response->amount );
 			}
 

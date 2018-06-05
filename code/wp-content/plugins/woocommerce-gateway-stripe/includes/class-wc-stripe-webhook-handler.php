@@ -98,7 +98,8 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 	 */
 	public function get_request_headers() {
 		if ( ! function_exists( 'getallheaders' ) ) {
-			$headers = [];
+			$headers = array();
+
 			foreach ( $_SERVER as $name => $value ) {
 				if ( 'HTTP_' === substr( $name, 0, 5 ) ) {
 					$headers[ str_replace( ' ', '-', ucwords( strtolower( str_replace( '_', ' ', substr( $name, 5 ) ) ) ) ) ] = $value;
@@ -300,17 +301,20 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 					$this->update_fees( $order, $notification->data->object->balance_transaction );
 				}
 
-				if ( is_callable( array( $order, 'save' ) ) ) {
-					$order->save();
-				}
-
-				/* translators: transaction id */
-				$order->update_status( $order->needs_processing() ? 'processing' : 'completed', sprintf( __( 'Stripe charge complete (Charge ID: %s)', 'woocommerce-gateway-stripe' ), $notification->data->object->id ) );
-
 				// Check and see if capture is partial.
 				if ( $this->is_partial_capture( $notification ) ) {
-					$order->set_total( $this->get_partial_amount_to_charge( $notification ) );
-					$order->add_order_note( __( 'This charge was partially captured via Stripe Dashboard', 'woocommerce-gateway-stripe' ) );
+					$partial_amount = $this->get_partial_amount_to_charge( $notification );
+					$order->set_total( $partial_amount );
+					/* translators: partial captured amount */
+					$order->add_order_note( sprintf( __( 'This charge was partially captured via Stripe Dashboard in the amount of: %s', 'woocommerce-gateway-stripe' ), $partial_amount ) );
+				} else {
+					$order->payment_complete( $notification->data->object->id );
+
+					/* translators: transaction id */
+					$order->add_order_note( sprintf( __( 'Stripe charge complete (Charge ID: %s)', 'woocommerce-gateway-stripe' ), $notification->data->object->id ) );
+				}
+
+				if ( is_callable( array( $order, 'save' ) ) ) {
 					$order->save();
 				}
 			}
@@ -351,20 +355,21 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 			$this->update_fees( $order, $notification->data->object->balance_transaction );
 		}
 
+		$order->payment_complete( $notification->data->object->id );
+
+		/* translators: transaction id */
+		$order->add_order_note( sprintf( __( 'Stripe charge complete (Charge ID: %s)', 'woocommerce-gateway-stripe' ), $notification->data->object->id ) );
+
 		if ( is_callable( array( $order, 'save' ) ) ) {
 			$order->save();
 		}
-
-		/* translators: transaction id */
-		$order->update_status( $order->needs_processing() ? 'processing' : 'completed', sprintf( __( 'Stripe charge complete (Charge ID: %s)', 'woocommerce-gateway-stripe' ), $notification->data->object->id ) );
 	}
 
 	/**
-	 * Process webhook charge failed. This is used for payment methods
-	 * that takes time to clear which is asynchronous. e.g. SEPA, SOFORT.
+	 * Process webhook charge failed.
 	 *
 	 * @since 4.0.0
-	 * @version 4.0.0
+	 * @since 4.1.5 Can handle any fail payments from any methods.
 	 * @param object $notification
 	 */
 	public function process_webhook_charge_failed( $notification ) {
@@ -377,7 +382,8 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 
 		$order_id = WC_Stripe_Helper::is_pre_30() ? $order->id : $order->get_id();
 
-		if ( 'on-hold' !== $order->get_status() ) {
+		// If order status is already in failed status don't continue.
+		if ( 'failed' === $order->get_status() ) {
 			return;
 		}
 
@@ -459,7 +465,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 
 				$amount = wc_price( $notification->data->object->refunds->data[0]->amount / 100 );
 
-				if ( in_array( strtolower( $order->get_currency() ), WC_Stripe_Helper::no_decimal_currencies() ) ) {
+				if ( in_array( strtolower( WC_Stripe_Helper::is_pre_30() ? $order->get_order_currency() : $order->get_currency() ), WC_Stripe_Helper::no_decimal_currencies() ) ) {
 					$amount = wc_price( $notification->data->object->refunds->data[0]->amount );
 				}
 

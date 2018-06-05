@@ -80,13 +80,6 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	public $publishable_key;
 
 	/**
-	 * Do we accept bitcoin?
-	 *
-	 * @var bool
-	 */
-	public $bitcoin;
-
-	/**
 	 * Do we accept Payment Request?
 	 *
 	 * @var bool
@@ -163,7 +156,6 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 		$this->saved_cards                 = 'yes' === $this->get_option( 'saved_cards' );
 		$this->secret_key                  = $this->testmode ? $this->get_option( 'test_secret_key' ) : $this->get_option( 'secret_key' );
 		$this->publishable_key             = $this->testmode ? $this->get_option( 'test_publishable_key' ) : $this->get_option( 'publishable_key' );
-		$this->bitcoin                     = 'USD' === strtoupper( get_woocommerce_currency() ) && 'yes' === $this->get_option( 'stripe_bitcoin' );
 		$this->payment_request             = 'yes' === $this->get_option( 'payment_request', 'yes' );
 
 		if ( $this->stripe_checkout ) {
@@ -254,10 +246,6 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 			$icons_str .= $icons['diners'];
 		}
 
-		if ( $this->bitcoin && $this->stripe_checkout ) {
-			$icons_str .= $icons['bitcoin'];
-		}
-
 		return apply_filters( 'woocommerce_gateway_icon', $icons_str, $this->id );
 	}
 
@@ -276,6 +264,9 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 		$display_tokenization = $this->supports( 'tokenization' ) && is_checkout() && $this->saved_cards;
 		$total                = WC()->cart->total;
 		$user_email           = '';
+		$description          = $this->get_description() ? $this->get_description() : '';
+		$firstname            = '';
+		$lastname             = '';
 
 		// If paying from order, we need to get total from order not cart.
 		if ( isset( $_GET['pay_for_order'] ) && ! empty( $_GET['key'] ) ) {
@@ -291,7 +282,10 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 
 		if ( is_add_payment_method_page() ) {
 			$pay_button_text = __( 'Add Card', 'woocommerce-gateway-stripe' );
-			$total        = '';
+			$total           = '';
+			$firstname       = $user->user_firstname;
+			$lastname        = $user->user_lastname;
+
 		} elseif ( function_exists( 'wcs_order_contains_subscription' ) && isset( $_GET['change_payment_method'] ) ) {
 			$pay_button_text = __( 'Change Payment Method', 'woocommerce-gateway-stripe' );
 			$total        = '';
@@ -311,21 +305,21 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 			data-shipping-address="' . esc_attr( apply_filters( 'wc_stripe_checkout_require_shipping_address', false ) ? 'true' : 'false' ) . '" 
 			data-amount="' . esc_attr( WC_Stripe_Helper::get_stripe_amount( $total ) ) . '"
 			data-name="' . esc_attr( $this->statement_descriptor ) . '"
+			data-full-name="' . esc_attr( $firstname . ' ' . $lastname ) . '"
 			data-currency="' . esc_attr( strtolower( get_woocommerce_currency() ) ) . '"
 			data-image="' . esc_attr( $this->stripe_checkout_image ) . '"
-			data-bitcoin="' . esc_attr( ( $this->bitcoin && $this->capture ) ? 'true' : 'false' ) . '"
 			data-locale="' . esc_attr( apply_filters( 'wc_stripe_checkout_locale', $this->get_locale() ) ) . '"
 			data-three-d-secure="' . esc_attr( $this->three_d_secure ? 'true' : 'false' ) . '"
 			data-allow-remember-me="' . esc_attr( apply_filters( 'wc_stripe_allow_remember_me', true ) ? 'true' : 'false' ) . '">';
 
-		if ( $this->description ) {
+		if ( $description ) {
 			if ( $this->testmode ) {
 				/* translators: link to Stripe testing page */
-				$this->description .= ' ' . sprintf( __( 'TEST MODE ENABLED. In test mode, you can use the card number 4242424242424242 with any CVC and a valid expiration date or check the <a href="%s" target="_blank">Testing Stripe documentation</a> for more card numbers.', 'woocommerce-gateway-stripe' ), 'https://stripe.com/docs/testing' );
-				$this->description  = trim( $this->description );
+				$description .= ' ' . sprintf( __( 'TEST MODE ENABLED. In test mode, you can use the card number 4242424242424242 with any CVC and a valid expiration date or check the <a href="%s" target="_blank">Testing Stripe documentation</a> for more card numbers.', 'woocommerce-gateway-stripe' ), 'https://stripe.com/docs/testing' );
+				$description  = trim( $description );
 			}
 
-			echo apply_filters( 'wc_stripe_description', wpautop( wp_kses_post( $this->description ) ), $this->id );
+			echo apply_filters( 'wc_stripe_description', wpautop( wp_kses_post( $description ) ), $this->id );
 		}
 
 		if ( $display_tokenization ) {
@@ -367,29 +361,32 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 					<?php esc_html_e( 'Credit or debit card', 'woocommerce-gateway-stripe' ); ?>
 				</label>
 
-				<div id="stripe-card-element" style="background:#fff;padding:0 1em;border:1px solid #ddd;margin:5px 0;padding:10px 5px;">
+				<div id="stripe-card-element" class="wc-stripe-elements-field">
 				<!-- a Stripe Element will be inserted here. -->
 				</div>
 			<?php } else { ?>
 				<div class="form-row form-row-wide">
-					<label><?php _e( 'Card Number', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
+					<label for="stripe-card-element"><?php esc_html_e( 'Card Number', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
+					<div class="stripe-card-group">
+						<div id="stripe-card-element" class="wc-stripe-elements-field">
+						<!-- a Stripe Element will be inserted here. -->
+						</div>
 
-					<div id="stripe-card-element" style="background:#fff;padding:0 1em;border:1px solid #ddd;margin:5px 0;padding:10px 5px;">
-					<!-- a Stripe Element will be inserted here. -->
+						<i class="stripe-credit-card-brand stripe-card-brand" alt="Credit Card"></i>
 					</div>
 				</div>
 
 				<div class="form-row form-row-first">
-					<label><?php _e( 'Expiry Date', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
+					<label for="stripe-exp-element"><?php esc_html_e( 'Expiry Date', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
 
-					<div id="stripe-exp-element" style="background:#fff;padding:0 1em;border:1px solid #ddd;margin:5px 0;padding:10px 5px;">
+					<div id="stripe-exp-element" class="wc-stripe-elements-field">
 					<!-- a Stripe Element will be inserted here. -->
 					</div>
 				</div>
 
 				<div class="form-row form-row-last">
-					<label><?php _e( 'Card Code (CVC)', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
-				<div id="stripe-cvc-element" style="background:#fff;padding:0 1em;border:1px solid #ddd;margin:5px 0;padding:10px 5px;">
+					<label for="stripe-cvc-element"><?php esc_html_e( 'Card Code (CVC)', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
+				<div id="stripe-cvc-element" class="wc-stripe-elements-field">
 				<!-- a Stripe Element will be inserted here. -->
 				</div>
 				</div>
@@ -449,10 +446,23 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 			WC_Stripe_Logger::log( 'Stripe live mode requires SSL.' );
 		}
 
+		$current_theme = wp_get_theme();
+
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		wp_register_style( 'stripe_styles', plugins_url( 'assets/css/stripe-styles.css', WC_STRIPE_MAIN_FILE ), array(), WC_STRIPE_VERSION );
 		wp_enqueue_style( 'stripe_styles' );
+
+		if ( 'storefront' === $current_theme->get_template() ) {
+			wp_register_style( 'stripe_storefront_styles', plugins_url( 'assets/css/stripe-storefront-styles.css', WC_STRIPE_MAIN_FILE ), array(), WC_STRIPE_VERSION );
+			wp_enqueue_style( 'stripe_storefront_styles' );
+		}
+
+		if ( 'twentyseventeen' === $current_theme->get_template() ) {
+			wp_register_style( 'stripe_twentyseventeen_styles', plugins_url( 'assets/css/stripe-twentyseventeen-styles.css', WC_STRIPE_MAIN_FILE ), array(), WC_STRIPE_VERSION );
+			wp_enqueue_style( 'stripe_twentyseventeen_styles' );
+		}
+
 		wp_register_script( 'stripe_checkout', 'https://checkout.stripe.com/checkout.js', '', WC_STRIPE_VERSION, true );
 		wp_register_script( 'stripe', 'https://js.stripe.com/v3/', '', '3.0', true );
 		wp_register_script( 'woocommerce_stripe', plugins_url( 'assets/js/stripe' . $suffix . '.js', WC_STRIPE_MAIN_FILE ), array( 'jquery-payment', 'stripe' ), WC_STRIPE_VERSION, true );
@@ -556,7 +566,6 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 			data-name="' . esc_attr( $this->statement_descriptor ) . '"
 			data-currency="' . esc_attr( strtolower( get_woocommerce_currency() ) ) . '"
 			data-image="' . esc_attr( $this->stripe_checkout_image ) . '"
-			data-bitcoin="' . esc_attr( ( $this->bitcoin && $this->capture ) ? 'true' : 'false' ) . '"
 			data-locale="' . esc_attr( apply_filters( 'wc_stripe_checkout_locale', $this->get_locale() ) ) . '"
 			data-three-d-secure="' . esc_attr( $this->three_d_secure ? 'true' : 'false' ) . '"
 			data-allow-remember-me="' . esc_attr( apply_filters( 'wc_stripe_allow_remember_me', true ) ? 'true' : 'false' ) . '">';
@@ -630,11 +639,14 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * @return bool
 	 */
 	public function maybe_redirect_stripe_checkout() {
+		$is_payment_request = ( isset( $_POST ) && isset( $_POST['payment_request_type'] ) );
+
 		return (
 			$this->stripe_checkout &&
 			! isset( $_POST['stripe_checkout_order'] ) &&
 			! $this->is_using_saved_payment_method() &&
-			! is_wc_endpoint_url( 'order-pay' )
+			! is_wc_endpoint_url( 'order-pay' ) &&
+			! $is_payment_request
 		);
 	}
 
@@ -727,12 +739,18 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 						$order->save();
 					}
 
-					WC_Stripe_Logger::log( 'Info: Redirecting to 3DS...' );
+					/*
+					 * Make sure after creating 3DS object it is in pending status
+					 * before redirecting.
+					 */
+					if ( 'pending' === $response->redirect->status ) {
+						WC_Stripe_Logger::log( 'Info: Redirecting to 3DS...' );
 
-					return array(
-						'result'   => 'success',
-						'redirect' => esc_url_raw( $response->redirect->url ),
-					);
+						return array(
+							'result'   => 'success',
+							'redirect' => esc_url_raw( $response->redirect->url ),
+						);
+					}
 				}
 
 				WC_Stripe_Logger::log( "Info: Begin processing payment for order $order_id for the amount of {$order->get_total()}" );
@@ -827,10 +845,6 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 
 			/* translators: error message */
 			$order->update_status( 'failed' );
-
-			if ( $order->has_status( array( 'pending', 'failed' ) ) ) {
-				$this->send_failed_order_email( $order_id );
-			}
 
 			return array(
 				'result'   => 'fail',

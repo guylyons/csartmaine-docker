@@ -17,7 +17,7 @@ services:
    wordpress:
      depends_on:
        - db
-     image: wordpress:latest
+     build: ./make
      volumes:
        - ./code:/var/www/html
      ports:
@@ -27,5 +27,6 @@ services:
        WORDPRESS_DB_HOST: db:3306
        WORDPRESS_DB_USER: wordpress
        WORDPRESS_DB_PASSWORD: wordpress
+       VIRTUAL_HOST: aclearing.dev
 volumes:
     db_data:
